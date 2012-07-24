@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms import ModelChoiceField
 
 from .models import EasyCrudModel
+from .widgets import EasyCrudSelect
 
 
 class EasyCrudMixin(object):
@@ -53,6 +54,7 @@ class EasyCrudMixin(object):
                     field.queryset.model._easycrud_meta.owner_ref == self.owner_ref):
                     kwargs = {self.owner_ref: self.owner_ref_obj}
                     field.queryset = field.queryset.filter(**kwargs)
+                    field.widget = EasyCrudSelect(model=field.queryset.model)
         return form_class
 
     def get_form(self, form_class):
