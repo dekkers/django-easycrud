@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load easycrud %}
+
+{% block content %}
+{% easy_heading object_list.model %}
+{% easy_list %}
+{% endblock %}

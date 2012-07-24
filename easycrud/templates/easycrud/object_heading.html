@@ -1,0 +1,10 @@
+{% load static %}
+
+<h3>{{ model_title }} {{object}}
+{% if object.has_update %}
+  <a href="{{ object.update_url }}"><img src="{% static "admin/img/icon_changelink.gif" %}"></a>
+{% endif %}
+{% if object.has_delete %}
+  <a href="{{ object.delete_url }}"><img src="{% static "admin/img/icon_deletelink.gif" %}"></a>
+{% endif %}
+</h3>

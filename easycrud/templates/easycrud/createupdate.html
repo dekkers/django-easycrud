@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load easycrud i18n %}
+
+{% block content %}
+{% if object %}
+<h3>{{ object.model_name|capfirst }} {{object}}</h3>
+{% else %}
+<h3>Add {{ model_name }}</h3>
+{% endif %}
+<form action="" method="post">{% csrf_token %}
+<table class="form">
+  {{ form.as_table }}
+</table>
+<input type="hidden" name="success_url" value="{{ request.META.HTTP_REFERER }}" />
+<input type="submit" value="{% trans "Save" %}" />
+</form>
+{% endblock %}
