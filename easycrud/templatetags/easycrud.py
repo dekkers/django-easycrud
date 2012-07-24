@@ -5,6 +5,20 @@ from ..utils import get_model_by_name
 register = template.Library()
 
 
+@register.simple_tag
+def easy_object_show(obj):
+    html = "<table>"
+    for field in obj._meta.fields:
+        if field == obj._meta.auto_field:
+            continue
+        if (hasattr(obj, '_easycrud_meta') and
+            field.name == obj._easycrud_meta.owner_ref):
+            continue
+        html += "<tr><th>{0}:</th><td>{1}</td></tr>".format(field.name, getattr(obj, field.name))
+    html += "</table>"
+    return html
+
+
 @register.inclusion_tag("easycrud/object_heading.html", takes_context=True)
 def easy_object_heading(context, obj):
     if not obj:
