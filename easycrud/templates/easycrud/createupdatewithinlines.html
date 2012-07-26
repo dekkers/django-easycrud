@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load easycrud i18n jquery_tags %}
+{% load easycrud i18n jquery_tags static %}
 
 {% block extra_head %}
 {% include_jquery %}
@@ -33,7 +33,9 @@
   $(function() {
     $('form .dynamic').formset({
       prefix: '{{ formset.prefix }}',
-      formTemplate: '#id_empty_form'
+      formTemplate: '#id_empty_form',
+      deleteText: '<img src="{% static "admin/img/icon_deletelink.gif" %}">',
+      addText: '<img src="{% static "admin/img/icon_addlink.gif" %}" style="padding: 0 5px 0 2px;">{% trans "Add another" %}<br>'
     })
   })
 </script>
