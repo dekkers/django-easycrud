@@ -5,8 +5,20 @@ from django.views.generic import (ListView as DjangoListView, DetailView as Djan
 from django.contrib.auth.decorators import login_required
 from django.forms import ModelChoiceField
 
+from extra_views import UpdateWithInlinesView as StandardUpdateWithInlinesView, CreateWithInlinesView as StandardCreateWithInlinesView
+
 from .models import EasyCrudModel
 from .widgets import EasyCrudSelect
+
+
+def update_form_field(field, owner_ref, owner_ref_obj, update_widget=False):
+    if (isinstance(field, ModelChoiceField) and
+        issubclass(field.queryset.model, EasyCrudModel) and
+        field.queryset.model._easycrud_meta.owner_ref == owner_ref):
+        kwargs = {owner_ref: owner_ref_obj}
+        field.queryset = field.queryset.filter(**kwargs)
+        if update_widget:
+            field.widget = EasyCrudSelect(model=field.queryset.model)
 
 
 class EasyCrudMixin(object):
@@ -49,12 +61,8 @@ class EasyCrudMixin(object):
             # objects owned by the current user. This will only list those items
             # on the form and also accept only those values during validation.
             for field in form_class.base_fields.values():
-                if (isinstance(field, ModelChoiceField) and
-                    issubclass(field.queryset.model, EasyCrudModel) and
-                    field.queryset.model._easycrud_meta.owner_ref == self.owner_ref):
-                    kwargs = {self.owner_ref: self.owner_ref_obj}
-                    field.queryset = field.queryset.filter(**kwargs)
-                    field.widget = EasyCrudSelect(model=field.queryset.model)
+                update_form_field(field, self.owner_ref, self.owner_ref_obj, update_widget=True)
+
         return form_class
 
     def get_form(self, form_class):
@@ -62,6 +70,28 @@ class EasyCrudMixin(object):
         if self.owner_ref:
             setattr(form.instance, self.owner_ref, self.owner_ref_obj)
         return form
+
+
+class EasyCrudFormsetMixin(object):
+    def construct_formset(self):
+        formset = super(EasyCrudFormsetMixin, self).construct_formset()
+        self.owner_ref = self.model._easycrud_meta.owner_ref
+
+        if self.owner_ref:
+            profile = self.request.user.get_profile()
+            self.owner_ref_obj = getattr(profile, self.owner_ref)
+
+            # Update the form fields in every form currently in the formset.
+            for form in formset:
+                for field in form.fields.values():
+                    update_form_field(field, self.owner_ref, self.owner_ref_obj)
+
+            # The formset's empty_form is created using the class stored in
+            # formset.form, so we update that one too.
+            for field in formset.form.base_fields.values():
+                update_form_field(field, self.owner_ref, self.owner_ref_obj)
+
+        return formset
 
 
 class ListView(EasyCrudMixin, DjangoListView):
@@ -96,4 +126,18 @@ class DeleteView(EasyCrudMixin, DjangoDeleteView):
     def get_template_names(self):
         names = super(DeleteView, self).get_template_names()
         names.append("easycrud/delete.html")
+        return names
+
+
+class CreateWithInlinesView(EasyCrudMixin, StandardCreateWithInlinesView):
+    def get_template_names(self):
+        names = super(CreateWithInlinesView, self).get_template_names()
+        names.append("easycrud/createupdatewithinlines.html")
+        return names
+
+
+class UpdateWithInlinesView(EasyCrudMixin, StandardUpdateWithInlinesView):
+    def get_template_names(self):
+        names = super(UpdateWithInlinesView, self).get_template_names()
+        names.append("easycrud/createupdatewithinlines.html")
         return names
