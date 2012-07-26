@@ -9,7 +9,7 @@ register = template.Library()
 def easy_object_show(obj):
     html = "<table>"
     for field in obj._meta.fields:
-        if field == obj._meta.auto_field:
+        if field == obj._meta.auto_field or field.name in obj._easycrud_meta.exclude:
             continue
         if (hasattr(obj, '_easycrud_meta') and
             field.name == obj._easycrud_meta.owner_ref):

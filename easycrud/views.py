@@ -51,6 +51,10 @@ class EasyCrudMixin(object):
 
     def get_form_class(self):
         form_class = super(EasyCrudMixin, self).get_form_class()
+        if self.model._easycrud_meta.exclude:
+            for field_name in self.model._easycrud_meta.exclude:
+                del form_class.base_fields[field_name]
+
         if self.owner_ref:
             # Never display the owner field, as we always set it on the object
             # in get_form() below
