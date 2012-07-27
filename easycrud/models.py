@@ -7,6 +7,7 @@ from .utils import classproperty
 class EasyCrudOptions(object):
     actions = ["create", "update", "delete"]
     exclude = []
+    form_class = None
     inline_models = []
     owner_ref = None
 

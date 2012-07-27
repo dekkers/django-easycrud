@@ -7,6 +7,7 @@ from django.forms import ModelChoiceField
 
 from extra_views import UpdateWithInlinesView as StandardUpdateWithInlinesView, CreateWithInlinesView as StandardCreateWithInlinesView
 
+from .forms import get_form_class
 from .models import EasyCrudModel
 from .widgets import EasyCrudSelect
 
@@ -32,6 +33,8 @@ class EasyCrudMixin(object):
                 return ret
             profile = request.user.get_profile()
             self.owner_ref_obj = getattr(profile, self.owner_ref)
+        if self.model._easycrud_meta.form_class:
+            self.form_class = get_form_class(self.model._easycrud_meta.form_class)
         return super(EasyCrudMixin, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
