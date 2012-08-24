@@ -3,6 +3,7 @@ from django.db.models.loading import get_models
 
 from extra_views import InlineFormSet
 
+from .forms import get_form_class
 from .models import EasyCrudModel
 from .views import ListView, CreateView, DetailView, UpdateView, DeleteView, CreateWithInlinesView, UpdateWithInlinesView, EasyCrudFormsetMixin
 from .utils import get_model_by_name
@@ -20,8 +21,18 @@ def easycrud_urlpatterns():
         url_list.append(url('^%s/(?P<pk>\d+)/$' % name, DetailView.as_view(model=model), name='%s_detail' % name))
         if model._easycrud_meta.inline_models:
             inlines = []
-            for inline_model in model._easycrud_meta.inline_models:
-                inlines.append(type(inline_model + 'Inline', (EasyCrudFormsetMixin, InlineFormSet), {'model': get_model_by_name(inline_model), 'extra': 0}))
+            for inline in model._easycrud_meta.inline_models:
+                if isinstance(inline, dict):
+                    model_name = inline['model']
+                    attrs = inline.copy()
+                    if 'form_class' in attrs and isinstance(attrs['form_class'], basestring):
+                        attrs['form_class'] = get_form_class(attrs['form_class'])
+                else:
+                    model_name = inline
+                    attrs = {}
+                attrs['model'] = get_model_by_name(model_name)
+                attrs['extra'] = 0
+                inlines.append(type(model_name + 'Inline', (EasyCrudFormsetMixin, InlineFormSet), attrs))
             if model.has_create:
                 url_list.append(url('^%s/create/$' % name, CreateWithInlinesView.as_view(model=model, inlines=inlines), name='%s_create' % name))
             if model.has_update:

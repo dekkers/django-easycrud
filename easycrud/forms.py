@@ -50,6 +50,7 @@ class FormClassCache(object):
             cls.form_classes[name] = form_class
 
 get_form_class = FormClassCache.get_form_class
+register_form_class = FormClassCache.register_form_class
 
 
 class EasyCrudFormMetaclass(ModelFormMetaclass):
