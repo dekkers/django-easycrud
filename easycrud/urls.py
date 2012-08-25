@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls import patterns, url
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models.loading import get_models
 
 from extra_views import InlineFormSet
@@ -20,6 +22,8 @@ def easycrud_urlpatterns():
         url_list.append(url('^%s/$' % name, ListView.as_view(model=model), name='%s_list' % name))
         url_list.append(url('^%s/(?P<pk>\d+)/$' % name, DetailView.as_view(model=model), name='%s_detail' % name))
         if model._easycrud_meta.inline_models:
+            if 'dynamic_formset' not in settings.INSTALLED_APPS:
+                raise ImproperlyConfigured('The dynamic-formset app needs to be installed to use inline models')
             inlines = []
             for inline in model._easycrud_meta.inline_models:
                 if isinstance(inline, dict):
