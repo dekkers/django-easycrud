@@ -78,6 +78,12 @@ class EasyCrudMixin(object):
             setattr(form.instance, self.owner_ref, self.owner_ref_obj)
         return form
 
+    def get_success_url(self):
+        if self.request.POST['success_url']:
+            return self.request.POST['success_url']
+        else:
+            return super(EasyCrudMixin, self).get_success_url()
+
 
 class EasyCrudFormsetMixin(object):
     def construct_formset(self):
