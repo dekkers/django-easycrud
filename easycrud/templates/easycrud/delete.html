@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load easycrud i18n %}
+
+{% block content %}
+{% easy_object_heading object %}
+{% easy_object_show object %}
+{% trans "Press delete to confirm." %}
+<form action="" method="post">{% csrf_token %}
+<input type="hidden" name="success_url" value="{{ request.META.HTTP_REFERER }}" />
+<input type="submit" value="{% trans "Delete" %}" />
+</form>
+{% endblock %}
