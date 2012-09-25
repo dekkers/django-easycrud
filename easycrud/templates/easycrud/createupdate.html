@@ -7,7 +7,11 @@
 {% else %}
 <h3>Add {{ model_name }}</h3>
 {% endif %}
+{% if form.is_multipart %}
+<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+{% else %}
 <form action="" method="post">{% csrf_token %}
+{% endif %}
 <table class="form">
   {{ form.as_table }}
 </table>
