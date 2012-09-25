@@ -1,8 +1,8 @@
 from django.views.generic import (ListView as DjangoListView, DetailView as DjangoDetailView,
                                   UpdateView as DjangoUpdateView, CreateView as DjangoCreateView,
                                   DeleteView as DjangoDeleteView)
-
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.forms import ModelChoiceField
 
 from extra_views import UpdateWithInlinesView as StandardUpdateWithInlinesView, CreateWithInlinesView as StandardCreateWithInlinesView
@@ -81,8 +81,11 @@ class EasyCrudMixin(object):
     def get_success_url(self):
         if self.request.POST['success_url']:
             return self.request.POST['success_url']
+        elif self.success_url:
+            return self.success_url
         else:
-            return super(EasyCrudMixin, self).get_success_url()
+            name = self.model.model_name.replace(' ', '')
+            return reverse('%s_list' % name)
 
 
 class EasyCrudFormsetMixin(object):
