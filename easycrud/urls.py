@@ -3,11 +3,19 @@ from django.conf.urls import patterns, url
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.loading import get_models
 
-from extra_views import InlineFormSet
+extra_views_available = True
+
+try:
+    from extra_views import InlineFormSet
+except ImportError:
+    extra_views_available = False
+
 
 from .forms import get_form_class
 from .models import EasyCrudModel
-from .views import ListView, CreateView, DetailView, UpdateView, DeleteView, CreateWithInlinesView, UpdateWithInlinesView, EasyCrudFormsetMixin
+from .views import ListView, CreateView, DetailView, UpdateView, DeleteView, EasyCrudFormsetMixin
+if extra_views_available:
+    from .views import CreateWithInlinesView, UpdateWithInlinesView
 from .utils import get_model_by_name
 
 
@@ -24,6 +32,8 @@ def easycrud_urlpatterns():
         if model._easycrud_meta.inline_models:
             if 'dynamic_formset' not in settings.INSTALLED_APPS:
                 raise ImproperlyConfigured('The dynamic-formset app needs to be installed to use inline models')
+            if not extra_views_available:
+                raise ImproperlyConfigured('The extra-views app needs to be available to use inline models')
             inlines = []
             for inline in model._easycrud_meta.inline_models:
                 if isinstance(inline, dict):

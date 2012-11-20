@@ -5,7 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.forms import ModelChoiceField
 
-from extra_views import UpdateWithInlinesView as StandardUpdateWithInlinesView, CreateWithInlinesView as StandardCreateWithInlinesView
+extra_views_available = True
+try:
+    from extra_views import UpdateWithInlinesView as StandardUpdateWithInlinesView, CreateWithInlinesView as StandardCreateWithInlinesView
+except ImportError:
+    extra_views_available = False
 
 from .forms import get_form_class
 from .models import EasyCrudModel
@@ -145,15 +149,15 @@ class DeleteView(EasyCrudMixin, DjangoDeleteView):
         return names
 
 
-class CreateWithInlinesView(EasyCrudMixin, StandardCreateWithInlinesView):
-    def get_template_names(self):
-        names = super(CreateWithInlinesView, self).get_template_names()
-        names.append("easycrud/createupdatewithinlines.html")
-        return names
+if extra_views_available:
+    class CreateWithInlinesView(EasyCrudMixin, StandardCreateWithInlinesView):
+        def get_template_names(self):
+            names = super(CreateWithInlinesView, self).get_template_names()
+            names.append("easycrud/createupdatewithinlines.html")
+            return names
 
-
-class UpdateWithInlinesView(EasyCrudMixin, StandardUpdateWithInlinesView):
-    def get_template_names(self):
-        names = super(UpdateWithInlinesView, self).get_template_names()
-        names.append("easycrud/createupdatewithinlines.html")
-        return names
+    class UpdateWithInlinesView(EasyCrudMixin, StandardUpdateWithInlinesView):
+        def get_template_names(self):
+            names = super(UpdateWithInlinesView, self).get_template_names()
+            names.append("easycrud/createupdatewithinlines.html")
+            return names
