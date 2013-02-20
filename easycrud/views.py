@@ -13,6 +13,7 @@ except ImportError:
 
 from .forms import get_form_class
 from .models import EasyCrudModel
+from .utils import get_model_by_name
 from .widgets import EasyCrudSelect
 
 
@@ -36,7 +37,16 @@ class EasyCrudMixin(object):
             if ret:
                 return ret
             profile = request.user.get_profile()
-            self.owner_ref_obj = getattr(profile, self.owner_ref)
+            if request.user.is_staff:
+                if self.owner_ref in self.request.GET:
+                    model = get_model_by_name(self.owner_ref)
+                    pk = self.request.GET[self.owner_ref]
+                    self.owner_ref_obj = model.objects.get(pk=pk)
+                else:
+                    self.owner_ref_obj = getattr(profile, self.owner_ref)
+            else:
+                self.owner_ref_obj = getattr(profile, self.owner_ref)
+            setattr(self, self.owner_ref, self.owner_ref_obj)
         if self.model._easycrud_meta.form_class:
             self.form_class = get_form_class(self.model._easycrud_meta.form_class)
         return super(EasyCrudMixin, self).dispatch(request, *args, **kwargs)
