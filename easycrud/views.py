@@ -38,9 +38,9 @@ class EasyCrudMixin(object):
                 return ret
             profile = request.user.get_profile()
             if request.user.is_staff:
-                if self.owner_ref in self.request.GET:
+                if self.owner_ref in request.GET:
                     model = get_model_by_name(self.owner_ref)
-                    pk = self.request.GET[self.owner_ref]
+                    pk = request.GET[self.owner_ref]
                     self.owner_ref_obj = model.objects.get(pk=pk)
                 else:
                     self.owner_ref_obj = getattr(profile, self.owner_ref)
