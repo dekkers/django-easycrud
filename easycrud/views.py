@@ -36,16 +36,15 @@ class EasyCrudMixin(object):
             ret = login_required(lambda request: False)(request)
             if ret:
                 return ret
-            profile = request.user.get_profile()
             if request.user.is_staff:
                 if self.owner_ref in request.GET:
                     model = get_model_by_name(self.owner_ref)
                     pk = request.GET[self.owner_ref]
                     self.owner_ref_obj = model.objects.get(pk=pk)
                 else:
-                    self.owner_ref_obj = getattr(profile, self.owner_ref)
+                    self.owner_ref_obj = getattr(request.user, self.owner_ref)
             else:
-                self.owner_ref_obj = getattr(profile, self.owner_ref)
+                self.owner_ref_obj = getattr(request.user, self.owner_ref)
             setattr(self, self.owner_ref, self.owner_ref_obj)
         if self.model._easycrud_meta.form_class:
             self.form_class = get_form_class(self.model._easycrud_meta.form_class)
@@ -108,8 +107,7 @@ class EasyCrudFormsetMixin(object):
         self.owner_ref = self.model._easycrud_meta.owner_ref
 
         if self.owner_ref:
-            profile = self.request.user.get_profile()
-            self.owner_ref_obj = getattr(profile, self.owner_ref)
+            self.owner_ref_obj = getattr(self.request.user, self.owner_ref)
 
             # Update the form fields in every form currently in the formset.
             for form in formset:
