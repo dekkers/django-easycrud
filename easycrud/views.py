@@ -1,6 +1,7 @@
 from django.views.generic import (ListView as DjangoListView, DetailView as DjangoDetailView,
                                   UpdateView as DjangoUpdateView, CreateView as DjangoCreateView,
                                   DeleteView as DjangoDeleteView)
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.forms import ModelChoiceField
@@ -46,6 +47,13 @@ class EasyCrudMixin(object):
             else:
                 self.owner_ref_obj = getattr(request.user, self.owner_ref)
             setattr(self, self.owner_ref, self.owner_ref_obj)
+        else:
+            if hasattr(settings, 'EASYCRUD_REQUIRE_LOGIN') and settings.EASYCRUD_REQUIRE_LOGIN:
+                # Same hack as above
+                ret = login_required(lambda request: False)(request)
+                if ret:
+                    return ret
+
         if self.model._easycrud_meta.form_class:
             self.form_class = get_form_class(self.model._easycrud_meta.form_class)
         return super(EasyCrudMixin, self).dispatch(request, *args, **kwargs)
