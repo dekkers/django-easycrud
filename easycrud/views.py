@@ -100,11 +100,15 @@ class EasyCrudMixin(object):
         return form
 
     def get_success_url(self):
-        if self.request.POST['success_url']:
+        if 'success_url' in self.request.POST and self.request.POST['success_url']:
             return self.request.POST['success_url']
-        elif self.success_url:
+
+        if self.success_url:
             return self.success_url
-        else:
+
+        try:
+            return self.object.get_absolute_url()
+        except AttributeError:
             name = self.model.model_name.replace(' ', '')
             return reverse('%s_list' % name)
 
@@ -164,6 +168,15 @@ class DeleteView(EasyCrudMixin, DjangoDeleteView):
         names.append("easycrud/delete.html")
         return names
 
+    def get_success_url(self):
+        if 'success_url' in self.request.POST and self.request.POST['success_url']:
+            return self.request.POST['success_url']
+
+        if self.success_url:
+            return self.success_url
+
+        name = self.model.model_name.replace(' ', '')
+        return reverse('%s_list' % name)
 
 if extra_views_available:
     class CreateWithInlinesView(EasyCrudMixin, StandardCreateWithInlinesView):
