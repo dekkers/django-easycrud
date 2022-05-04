@@ -38,9 +38,7 @@ class EasyCrudModelBase(ModelBase):
         return super(EasyCrudModelBase, cls).__new__(cls, name, bases, attrs)
 
 
-class EasyCrudModel(models.Model):
-    __metaclass__ = EasyCrudModelBase
-
+class EasyCrudModel(models.Model, metaclass=EasyCrudModelBase):
     class Meta:
         abstract = True
 

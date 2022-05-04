@@ -30,7 +30,7 @@ def easy_object_heading(context, obj):
 
 @register.simple_tag
 def easy_heading(model):
-    if isinstance(model, basestring):
+    if isinstance(model, str):
         model = get_model_by_name(model)
     title = model._meta.verbose_name_plural.capitalize()
     if model.has_create:
