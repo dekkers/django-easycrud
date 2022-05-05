@@ -3,8 +3,8 @@ from django.views.generic import (ListView as DjangoListView, DetailView as Djan
                                   DeleteView as DjangoDeleteView)
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
 from django.forms import ModelChoiceField
+from django.urls import reverse
 
 extra_views_available = True
 try:
@@ -74,6 +74,9 @@ class EasyCrudMixin(object):
         return context
 
     def get_form_class(self):
+        if not self.fields:
+            self.fields = '__all__'
+
         form_class = super(EasyCrudMixin, self).get_form_class()
         if self.model._easycrud_meta.exclude:
             for field_name in self.model._easycrud_meta.exclude:
@@ -93,7 +96,7 @@ class EasyCrudMixin(object):
 
         return form_class
 
-    def get_form(self, form_class):
+    def get_form(self, form_class=None):
         form = super(EasyCrudMixin, self).get_form(form_class)
         if self.owner_ref:
             setattr(form.instance, self.owner_ref, self.owner_ref_obj)

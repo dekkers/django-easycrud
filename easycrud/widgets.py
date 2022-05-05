@@ -11,5 +11,5 @@ class EasyCrudSelect(Select):
     def render(self, *args, **kwargs):
         output = super(EasyCrudSelect, self).render(*args, **kwargs)
         if self.model.has_create:
-            output += '<a href="{0.create_url}"><img src="{1}admin/img/icon_addlink.gif"></a>'.format(self.model, settings.STATIC_URL)
+            output += '<a href="{0.create_url}"><img src="{1}admin/img/icon-addlink.svg"></a>'.format(self.model, settings.STATIC_URL)
         return mark_safe(output)

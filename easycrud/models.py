@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models.base import ModelBase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from .utils import classproperty
 
 
