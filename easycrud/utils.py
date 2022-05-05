@@ -1,4 +1,4 @@
-from django.db.models.loading import get_model, get_models
+from django.apps import apps
 
 
 # From http://stackoverflow.com/questions/128573/using-property-on-classmethods
@@ -10,9 +10,9 @@ class classproperty(property):
 def get_model_by_name(name):
     if '.' in name:
         app_label, model_name = name.split('.')
-        model = get_model(app_label, model_name)
+        model = apps.get_model(app_label, model_name)
     else:
-        model_list = get_models()
+        model_list = apps.get_models()
         found = False
         for m in model_list:
             if m.__name__.lower() == name.lower():

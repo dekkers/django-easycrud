@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.forms.models import ModelForm, ModelFormMetaclass
-from django.utils.importlib import import_module
-
-import imp
+from importlib import import_module
 
 
 class FormClassCache(object):
@@ -24,18 +22,12 @@ class FormClassCache(object):
         if cls.loaded:
             return
 
-        imp.acquire_lock()
-        try:
-            if cls.loaded:
-                return
-            for app_name in settings.INSTALLED_APPS:
-                try:
-                    import_module('.forms', app_name)
-                except ImportError:
-                    pass
-            cls.loaded = True
-        finally:
-            imp.release_lock()
+        for app_name in settings.INSTALLED_APPS:
+            try:
+                import_module('.forms', app_name)
+            except ImportError:
+                pass
+        cls.loaded = True
 
     @classmethod
     def get_form_class(cls, name):
